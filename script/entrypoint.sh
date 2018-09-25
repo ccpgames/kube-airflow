@@ -5,6 +5,7 @@ TRY_LOOP="${TRY_LOOP:-10}"
 POSTGRES_HOST="${POSTGRES_HOST:-postgres}"
 POSTGRES_PORT=5432
 POSTGRES_CREDS="${POSTGRES_CREDS:-airflow:airflow}"
+POSTGRES_SCHEMA="${POSTGRES_SCHEMA:-airflow}"
 RABBITMQ_HOST="${RABBITMQ_HOST:-rabbitmq}"
 RABBITMQ_CREDS="${RABBITMQ_CREDS:-airflow:airflow}"
 RABBITMQ_MANAGEMENT_PORT=15672
@@ -12,6 +13,12 @@ FLOWER_URL_PREFIX="${FLOWER_URL_PREFIX:-}"
 AIRFLOW_URL_PREFIX="${AIRFLOW_URL_PREFIX:-}"
 LOAD_DAGS_EXAMPLES="${LOAD_DAGS_EXAMPLES:-true}"
 GIT_SYNC_REPO="${GIT_SYNC_REPO:-}"
+
+LDAP_SERVER="${LDAP_SERVER:-}"
+LDAP_PORT="${LDAP_PORT:-}"
+LDAP_BIND_USER="${LDAP_BIND_USER:-}"
+LDAP_BIND_PASSWORD="${LDAP_BIND_PASSWORD:-}"
+LDAP_BASE_DN="${LDAP_BASE_DN:-}"
 
 if [ -z $FERNET_KEY ]; then
     FERNET_KEY=$(python3 -c "from cryptography.fernet import Fernet; FERNET_KEY = Fernet.generate_key().decode(); print(FERNET_KEY)")
@@ -27,11 +34,18 @@ echo
 sed -i "s/{{ FERNET_KEY }}/${FERNET_KEY}/" $AIRFLOW_HOME/airflow.cfg
 sed -i "s/{{ POSTGRES_HOST }}/${POSTGRES_HOST}/" $AIRFLOW_HOME/airflow.cfg
 sed -i "s/{{ POSTGRES_CREDS }}/${POSTGRES_CREDS}/" $AIRFLOW_HOME/airflow.cfg
+sed -i "s/{{ POSTGRES_SCHEMA }}/${POSTGRES_SCHEMA}/" $AIRFLOW_HOME/airflow.cfg
 sed -i "s/{{ RABBITMQ_HOST }}/${RABBITMQ_HOST}/" $AIRFLOW_HOME/airflow.cfg
 sed -i "s/{{ RABBITMQ_CREDS }}/${RABBITMQ_CREDS}/" $AIRFLOW_HOME/airflow.cfg
 sed -i "s/{{ LOAD_DAGS_EXAMPLES }}/${LOAD_DAGS_EXAMPLES}/" $AIRFLOW_HOME/airflow.cfg
 sed -i "s#{{ FLOWER_URL_PREFIX }}#${FLOWER_URL_PREFIX}#" $AIRFLOW_HOME/airflow.cfg
 sed -i "s#{{ AIRFLOW_URL_PREFIX }}#${AIRFLOW_URL_PREFIX}#" $AIRFLOW_HOME/airflow.cfg
+
+sed -i "s#{{ LDAP_SERVER }}#${LDAP_SERVER}#" $AIRFLOW_HOME/airflow.cfg
+sed -i "s#{{ LDAP_PORT }}#${LDAP_PORT}#" $AIRFLOW_HOME/airflow.cfg
+sed -i "s#{{ LDAP_BIND_USER }}#${LDAP_BIND_USER}#" $AIRFLOW_HOME/airflow.cfg
+sed -i "s#{{ LDAP_BIND_PASSWORD }}#${LDAP_BIND_PASSWORD}#" $AIRFLOW_HOME/airflow.cfg
+sed -i "s#{{ LDAP_BASE_DN }}#${LDAP_BASE_DN}#" $AIRFLOW_HOME/airflow.cfg
 
 # wait for rabbitmq
 if [ "$1" = "webserver" ] || [ "$1" = "worker" ] || [ "$1" = "scheduler" ] || [ "$1" = "flower" ] ; then
