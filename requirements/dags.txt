@@ -2,4 +2,5 @@
 # installed inside the container during the container build, independently if you use embedded DAGs
 # of Git-sync.
 
+boto3
 ruamel-yaml
