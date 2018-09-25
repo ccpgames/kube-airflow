@@ -12,10 +12,9 @@ ENV     DEBIAN_FRONTEND noninteractive
 ENV     TERM linux
 
 # Airflow
-ARG     AIRFLOW_VERSION=%%AIRFLOW_VERSION%%
+ARG     AIRFLOW_VERSION=$AIRFLOW_VERSION
 ENV     AIRFLOW_HOME /usr/local/airflow
-ENV     EMBEDDED_DAGS_LOCATION=%%EMBEDDED_DAGS_LOCATION%%
-ENV     REQUIREMENTS_TXT_LOCATION=%%REQUIREMENTS_TXT_LOCATION%%
+ENV     REQUIREMENTS_TXT_LOCATION=$REQUIREMENTS_TXT_LOCATION
 
 # Define en_US.
 ENV     LANGUAGE en_US.UTF-8
@@ -28,12 +27,13 @@ ENV     LC_ALL en_US.UTF-8
 WORKDIR /requirements
 # Only copy needed files
 COPY    requirements/airflow.txt /requirements/airflow.txt
-COPY    ${REQUIREMENTS_TXT_LOCATION} /requirements/dags.txt
+COPY    requirements/dags.txt /requirements/dags.txt
 
-
+ENV AIRFLOW_GPL_UNIDECODE=1
 RUN         set -ex \
         &&  buildDeps=' \
                 build-essential \
+                default-libmysqlclient-dev \
                 libblas-dev \
                 libffi-dev \
                 libkrb5-dev \
@@ -59,7 +59,7 @@ RUN         set -ex \
         &&  locale-gen \
         &&  update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
         &&  useradd -ms /bin/bash -d ${AIRFLOW_HOME} airflow \
-        &&  pip3 install --upgrade pip 'setuptools!=36.0.0' \
+        &&  pip3 install setuptools \
         &&  if [ ! -e /usr/bin/pip ]; then ln -s /usr/bin/pip3 /usr/bin/pip ; fi \
         &&  if [ ! -e /usr/bin/python ]; then ln -sf /usr/bin/python3 /usr/bin/python; fi \
         &&  pip3 install -r /requirements/airflow.txt \
@@ -74,7 +74,7 @@ RUN         set -ex \
                 /usr/share/doc \
                 /usr/share/doc-base
 
-ENV         KUBECTL_VERSION %%KUBECTL_VERSION%%
+ENV         KUBECTL_VERSION $KUBECTL_VERSION
 
 RUN         curl -L -o /usr/local/bin/kubectl \
                 https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl \
@@ -83,7 +83,6 @@ RUN         curl -L -o /usr/local/bin/kubectl \
 COPY        script/entrypoint.sh ${AIRFLOW_HOME}/entrypoint.sh
 COPY        config/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
 COPY        script/git-sync ${AIRFLOW_HOME}/git-sync
-COPY        ${EMBEDDED_DAGS_LOCATION} ${AIRFLOW_HOME}/dags
 COPY        script/git-sync ${AIRFLOW_HOME}/git-sync
 
 RUN         chown -R airflow: ${AIRFLOW_HOME} \
