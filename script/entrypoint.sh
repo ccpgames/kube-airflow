@@ -20,6 +20,9 @@ LDAP_BIND_USER="${LDAP_BIND_USER:-}"
 LDAP_BIND_PASSWORD="${LDAP_BIND_PASSWORD:-}"
 LDAP_BASE_DN="${LDAP_BASE_DN:-}"
 
+S3_LOGGING_BUCKET="${S3_LOGGING_BUCKET:-ccp-china-data}"
+S3_LOGGING_PREFIX="${S3_LOGGING_PREFIX:-airflow}"
+
 if [ -z $FERNET_KEY ]; then
     FERNET_KEY=$(python3 -c "from cryptography.fernet import Fernet; FERNET_KEY = Fernet.generate_key().decode(); print(FERNET_KEY)")
 fi
@@ -46,6 +49,9 @@ sed -i "s#{{ LDAP_PORT }}#${LDAP_PORT}#" $AIRFLOW_HOME/airflow.cfg
 sed -i "s#{{ LDAP_BIND_USER }}#${LDAP_BIND_USER}#" $AIRFLOW_HOME/airflow.cfg
 sed -i "s#{{ LDAP_BIND_PASSWORD }}#${LDAP_BIND_PASSWORD}#" $AIRFLOW_HOME/airflow.cfg
 sed -i "s#{{ LDAP_BASE_DN }}#${LDAP_BASE_DN}#" $AIRFLOW_HOME/airflow.cfg
+
+sed -i "s#{{ S3_LOGGING_BUCKET }}#${S3_LOGGING_BUCKET}#" $AIRFLOW_HOME/airflow.cfg
+sed -i "s#{{ S3_LOGGING_PREFIX }}#${S3_LOGGING_PREFIX}#" $AIRFLOW_HOME/airflow.cfg
 
 # wait for rabbitmq
 if [ "$1" = "webserver" ] || [ "$1" = "worker" ] || [ "$1" = "scheduler" ] || [ "$1" = "flower" ] ; then
