@@ -58,7 +58,6 @@ RUN         set -ex \
         &&      sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
         &&  locale-gen \
         &&  update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
-        &&  useradd -ms /bin/bash -d ${AIRFLOW_HOME} airflow \
         &&  pip3 install setuptools \
         &&  if [ ! -e /usr/bin/pip ]; then ln -s /usr/bin/pip3 /usr/bin/pip ; fi \
         &&  if [ ! -e /usr/bin/python ]; then ln -sf /usr/bin/python3 /usr/bin/python; fi \
@@ -74,23 +73,11 @@ RUN         set -ex \
                 /usr/share/doc \
                 /usr/share/doc-base
 
-ENV         KUBECTL_VERSION $KUBECTL_VERSION
-
-RUN         curl -L -o /usr/local/bin/kubectl \
-                https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl \
-        &&  chmod +x /usr/local/bin/kubectl
-
-COPY        script/entrypoint.sh ${AIRFLOW_HOME}/entrypoint.sh
-COPY        config/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
-COPY        script/git-sync ${AIRFLOW_HOME}/git-sync
-COPY        script/git-sync ${AIRFLOW_HOME}/git-sync
-
-RUN         chown -R airflow: ${AIRFLOW_HOME} \
-        &&  chmod +x ${AIRFLOW_HOME}/entrypoint.sh \
-        &&  chmod +x ${AIRFLOW_HOME}/git-sync
+ENV AIRFLOW_CFG /usr/local/airflow/config
+RUN mkdir -p ${AIRFLOW_CFG}
+RUN ln -s ${AIRFLOW_CFG}/airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
 
 EXPOSE  8080 5555 8793
 
-USER        airflow
 WORKDIR     ${AIRFLOW_HOME}
-ENTRYPOINT  ["./entrypoint.sh"]
+ENTRYPOINT  ["airflow"]
