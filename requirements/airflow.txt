@@ -12,6 +12,5 @@ celery>=4.0.0
 flower>=0.7.3
 apache-airflow[all]
 git+https://github.com/apache/incubator-airflow#egg=airflow
-kubernetes
 Flask-WTF>=0.14
 click
