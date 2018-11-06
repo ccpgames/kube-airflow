@@ -10,7 +10,8 @@ pyasn1
 psycopg2-binary
 celery>=4.0.0
 flower>=0.7.3
-apache-airflow[all]
-git+https://github.com/apache/incubator-airflow#egg=airflow
+apache-airflow[all]==1.10.0
+#git+https://github.com/apache/incubator-airflow@5869feae871dd2b70e9c0b1fdb6315d034196aea#egg=apache-airflow
+#git+https://github.com/apache/incubator-airflow@v1-10-test#egg=apache-airflow
 Flask-WTF>=0.14
 click
